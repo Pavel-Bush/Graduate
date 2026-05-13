@@ -1,0 +1,10 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="padding: 24px 0;">
+    <h1>Личный кабинет</h1>
+    <p>Добро пожаловать, <%= user.full_name %>.</p>
+    <p>Email: <%= user.email %></p>
+    <p>Роль: <%= user.role %></p>
+    <!-- Позже: карты, штрафы, история -->
+</div>
+<%- include('../partials/footer') %>

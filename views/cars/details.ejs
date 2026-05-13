@@ -1,0 +1,28 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="padding-top:24px; padding-bottom:24px;">
+    <h1><%= car.brand %> <%= car.model %></h1>
+    <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-top:16px;">
+        <div style="flex: 1 1 300px;">
+            <img src="<%= car.image %>" alt="<%= car.brand %> <%= car.model %>" style="width:100%; border-radius: var(--radius);" onerror="this.src='/images/placeholder.jpg'">
+        </div>
+        <div style="flex: 1 1 300px;">
+            <h3>Характеристики</h3>
+            <p>Тип кузова: <%= car.body_type %></p>
+            <p>Коробка передач: <%= car.transmission %></p>
+            <p>Топливо: <%= car.fuel_type %></p>
+            <p>Мест: <%= car.seats %></p>
+            <p class="card-price" style="margin-top:16px;"><%= car.price_per_day.toLocaleString('ru-RU') %> ₽ / сутки</p>
+
+            <% if (locals.user) { %>
+                <form action="/rentals/create" method="GET" style="margin-top:16px;">
+                    <input type="hidden" name="car_id" value="<%= car.id %>">
+                    <button type="submit" class="btn">Забронировать</button>
+                </form>
+            <% } else { %>
+                <p style="margin-top:16px;"><a href="/auth/login">Войдите</a>, чтобы забронировать автомобиль.</p>
+            <% } %>
+        </div>
+    </div>
+</div>
+<%- include('../partials/footer') %>

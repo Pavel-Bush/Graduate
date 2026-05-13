@@ -1,0 +1,16 @@
+<% if (typeof errors !== 'undefined' && errors.length > 0) { %>
+    <div class="container" style="margin-top:16px;">
+        <% errors.forEach(err => { %>
+            <div style="background: #ffebee; color: var(--danger); padding: 8px 12px; border-radius: var(--radius); margin-bottom: 8px;">
+                <%= err.msg || err %>
+            </div>
+        <% }) %>
+    </div>
+<% } %>
+<% if (typeof success !== 'undefined' && success) { %>
+    <div class="container" style="margin-top:16px;">
+        <div style="background: #e8f5e9; color: var(--success); padding: 8px 12px; border-radius: var(--radius);">
+            <%= success %>
+        </div>
+    </div>
+<% } %>

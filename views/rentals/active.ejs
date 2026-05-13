@@ -1,0 +1,11 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="padding: 24px 0;">
+    <h1>Мои активные аренды</h1>
+    <% if (rentals.length === 0) { %>
+        <p>У вас нет активных аренд.</p>
+    <% } else { %>
+        <!-- таблица аренд появится позже -->
+    <% } %>
+</div>
+<%- include('../partials/footer') %>

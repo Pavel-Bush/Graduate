@@ -1,19 +1,35 @@
 {
-  "name": "rentaluxe",
-  "version": "1.0.0",
-  "description": "car rental web app",
-  "main": "app.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Pavel-Bush/Graduate.git"
-  },
-  "author": "Pavel-Bush",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/Pavel-Bush/Graduate/issues"
-  },
-  "homepage": "https://github.com/Pavel-Bush/Graduate#readme"
+	"name": "rentaluxe",
+	"version": "1.0.0",
+	"description": "car rental web app",
+	"main": "app.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1",
+		"start": "node app.js",
+		"dev": "nodemon app.js"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/Pavel-Bush/Graduate.git"
+	},
+	"author": "Pavel-Bush",
+	"license": "ISC",
+	"bugs": {
+		"url": "https://github.com/Pavel-Bush/Graduate/issues"
+	},
+	"homepage": "https://github.com/Pavel-Bush/Graduate#readme",
+	"dependencies": {
+		"bcrypt": "^6.0.0",
+		"dotenv": "^17.4.2",
+		"ejs": "^5.0.2",
+		"express": "^5.2.1",
+		"express-session": "^1.19.0",
+		"express-validator": "^7.3.2",
+		"method-override": "^3.0.0",
+		"mysql2": "^3.22.3",
+		"web-push": "^3.6.7"
+	},
+	"devDependencies": {
+		"nodemon": "^3.1.14"
+	}
 }

@@ -1,0 +1,17 @@
+<nav class="navbar">
+    <a href="/" class="navbar-brand">Rentaluxe</a>
+    <ul class="navbar-nav">
+        <li><a href="/cars" class="<%= currentPage === 'catalog' ? 'active' : '' %>">Каталог</a></li>
+        <% if (locals.user) { %>
+            <li><a href="/rentals/active" class="<%= currentPage === 'rentals' ? 'active' : '' %>">Мои аренды</a></li>
+            <li><a href="/profile" class="<%= currentPage === 'profile' ? 'active' : '' %>">Профиль</a></li>
+            <% if (locals.user.role === 'employee' || locals.user.role === 'admin') { %>
+                <li><a href="/admin" class="<%= currentPage === 'admin' ? 'active' : '' %>">Админ-панель</a></li>
+            <% } %>
+            <li><a href="/auth/logout">Выйти</a></li>
+        <% } else { %>
+            <li><a href="/auth/login" class="<%= currentPage === 'login' ? 'active' : '' %>">Вход</a></li>
+            <li><a href="/auth/register" class="<%= currentPage === 'register' ? 'active' : '' %>">Регистрация</a></li>
+        <% } %>
+    </ul>
+</nav>

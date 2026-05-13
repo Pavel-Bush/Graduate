@@ -1,0 +1,31 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="max-width: 400px; margin-top: 32px;">
+    <h1 style="margin-bottom: 16px;">Регистрация</h1>
+    <%- include('../partials/alerts') %>
+    <form action="/auth/register" method="POST">
+        <div class="form-group">
+            <label for="full_name">ФИО</label>
+            <input type="text" id="full_name" name="full_name" class="form-control" value="<%= typeof formData !== 'undefined' ? formData.full_name || '' : '' %>" required>
+        </div>
+        <div class="form-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" class="form-control" value="<%= typeof formData !== 'undefined' ? formData.email || '' : '' %>" required>
+        </div>
+        <div class="form-group">
+            <label for="phone">Телефон</label>
+            <input type="tel" id="phone" name="phone" class="form-control" value="<%= typeof formData !== 'undefined' ? formData.phone || '' : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="driver_license_number">Номер водительского удостоверения</label>
+            <input type="text" id="driver_license_number" name="driver_license_number" class="form-control" value="<%= typeof formData !== 'undefined' ? formData.driver_license_number || '' : '' %>">
+        </div>
+        <div class="form-group">
+            <label for="password">Пароль</label>
+            <input type="password" id="password" name="password" class="form-control" required>
+        </div>
+        <button type="submit" class="btn" style="width:100%;">Зарегистрироваться</button>
+    </form>
+    <p style="margin-top: 16px; text-align: center;">Уже есть аккаунт? <a href="/auth/login">Войти</a></p>
+</div>
+<%- include('../partials/footer') %>

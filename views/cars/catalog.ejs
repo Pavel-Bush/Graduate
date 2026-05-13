@@ -1,0 +1,55 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="padding-top: 24px; padding-bottom: 24px;">
+    <h1 style="margin-bottom: 16px;">Каталог автомобилей</h1>
+
+    <!-- Блок фильтров (пока не функционален, но показывает дизайн) -->
+    <form class="filters" method="get" action="/cars">
+        <div class="form-group">
+            <label for="brand">Марка</label>
+            <select class="form-control" id="brand" name="brand">
+                <option value="">Все</option>
+                <option value="Toyota">Toyota</option>
+                <option value="Volkswagen">Volkswagen</option>
+                <option value="Hyundai">Hyundai</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="body_type">Тип кузова</label>
+            <select class="form-control" id="body_type" name="body_type">
+                <option value="">Все</option>
+                <option value="sedan">Седан</option>
+                <option value="hatchback">Хэтчбек</option>
+                <option value="suv">Внедорожник</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label for="start_date">Дата начала</label>
+            <input type="date" class="form-control" id="start_date" name="start_date">
+        </div>
+        <div class="form-group">
+            <label for="end_date">Дата окончания</label>
+            <input type="date" class="form-control" id="end_date" name="end_date">
+        </div>
+        <button type="submit" class="btn">Показать</button>
+    </form>
+
+    <!-- Сетка автомобилей -->
+    <% if (cars.length > 0) { %>
+        <div class="grid">
+            <% cars.forEach(car => { %>
+                <div class="card">
+                    <img src="<%= car.image %>" alt="<%= car.brand %> <%= car.model %>" style="width:100%; height:180px; object-fit:cover; border-radius:4px; margin-bottom:12px;" onerror="this.src='/images/placeholder.png'">
+                    <div class="card-title"><%= car.brand %> <%= car.model %></div>
+                    <div class="card-text">Кузов: <%= car.body_type === 'sedan' ? 'Седан' : car.body_type === 'hatchback' ? 'Хэтчбек' : 'Внедорожник' %></div>
+                    <div class="card-text">КПП: <%= car.transmission === 'automatic' ? 'Автомат' : 'Механика' %></div>
+                    <div class="card-price"><%= car.price_per_day.toLocaleString('ru-RU') %> ₽ / сутки</div>
+                    <a href="/cars/<%= car.id %>" class="btn" style="margin-top:8px;">Подробнее</a>
+                </div>
+            <% }) %>
+        </div>
+    <% } else { %>
+        <p>По вашему запросу автомобилей не найдено.</p>
+    <% } %>
+</div>
+<%- include('../partials/footer') %>
