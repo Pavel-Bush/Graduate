@@ -1,0 +1,19 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="padding: 24px 0;">
+    <h1>Дополнительные услуги</h1>
+    <p><%= rental.brand %> <%= rental.model %> (гос. номер <%= rental.license_plate %>)</p>
+    <%- include('../partials/alerts') %>
+    <form method="POST" action="/rentals/<%= rental.id %>/services">
+        <h3>Список услуг</h3>
+        <% allServices.forEach(service => { %>
+            <div class="form-group">
+                <label><%= service.name %> (<%= service.base_price %> ₽ / <%= service.unit_type === 'day' ? 'день' : (service.unit_type === 'hour' ? 'час' : 'шт') %>)</label>
+                <input type="number" class="form-control" name="qty_<%= service.id %>" min="0" step="1" value="<%= servicesMap[service.id] || 0 %>">
+            </div>
+        <% }) %>
+        <button type="submit" class="btn">Сохранить</button>
+        <a href="/rentals/active" class="btn-outline">Назад</a>
+    </form>
+</div>
+<%- include('../partials/footer') %>

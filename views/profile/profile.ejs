@@ -3,8 +3,23 @@
 <div class="container" style="padding: 24px 0;">
     <h1>Личный кабинет</h1>
     <p>Добро пожаловать, <%= user.full_name %>.</p>
-    <p>Email: <%= user.email %></p>
-    <p>Роль: <%= user.role %></p>
-    <!-- Позже: карты, штрафы, история -->
+    <p>Email: <%= user.email %>, Роль: <%= user.role %></p>
+
+    <h2>Мои штрафы</h2>
+    <% if (fines.length === 0) { %>
+        <p>Штрафов нет.</p>
+    <% } else { %>
+        <ul>
+            <% fines.forEach(fine => { %>
+                <li>
+                    <%= fine.amount %> ₽ — <%= fine.reason || 'Без причины' %> 
+                    (статус: <%= fine.status %>)
+                    <% if (fine.status === 'unpaid') { %>
+                        <a href="/rentals/<%= fine.rental_id %>/pay-fines" class="btn-outline" style="font-size:0.8rem; padding:4px 8px;">Оплатить</a>
+                    <% } %>
+                </li>
+            <% }) %>
+        </ul>
+    <% } %>
 </div>
 <%- include('../partials/footer') %>

@@ -1,8 +1,12 @@
 <%- include('../partials/head', { title: title }) %>
-<%- include('../partials/header') %>
-<div class="container" style="padding: 24px 0;">
+<p%- include('../partials/header') %>
+< class="container" style="padding: 24px 0;">
     <h1>Административная панель</h1>
     <p>Статистика появится позже.</p>
     <p>Вы вошли как: <%= user.role %></p>
+    <p><a href="/admin/rentals">Управление арендами</a></p>
+    <p><a href="/admin/cars">Автопарк</a></p>
+    <p><a href="/admin/users">Пользователи</a></p>
+    <p><a href="/admin/fines" >Выписать штраф</a></p>
 </div>
 <%- include('../partials/footer') %>

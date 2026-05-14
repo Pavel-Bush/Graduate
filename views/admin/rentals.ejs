@@ -1,0 +1,37 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="padding: 24px 0;">
+    <h1>Аренды</h1>
+    <table style="width:100%; border-collapse: collapse;">
+        <thead>
+            <tr>
+                <th>ID</th><th>Клиент</th><th>Авто</th><th>Госномер</th><th>Статус</th><th>Подтверждение оплаты</th><th>Период</th><th>Действия</th>
+            </tr>
+        </thead>
+        <tbody>
+        <% rentals.forEach(r => { %>
+            <tr>
+                <td><%= r.id %></td>
+                <td><%= r.client_name %></td>
+                <td><%= r.brand %> <%= r.model %></td>
+                <td><%= r.license_plate %></td>
+                <td><%= r.status %></td>
+                <td><% if (r.pendingCashPaymentId) { %>
+                    <form action="/admin/cash-payments/<%= r.pendingCashPaymentId %>/confirm" method="POST" style="display:inline;">
+                        <button type="submit" class="btn">Подтвердить оплату наличными</button>
+                    </form>
+                <% } %></td>
+                <td><%= new Date(r.start_datetime).toLocaleString() %> — <%= new Date(r.end_datetime).toLocaleString() %></td>
+                <td>
+                    <% if (r.status === 'paid') { %>
+                        <form action="/admin/rentals/<%= r.id %>/start" method="POST"><button class="btn">Выдать</button></form>
+                    <% } else if (r.status === 'active') { %>
+                        <form action="/admin/rentals/<%= r.id %>/complete" method="POST"><button class="btn">Завершить</button></form>
+                    <% } %>
+                </td>
+            </tr>
+        <% }) %>
+        </tbody>
+    </table>
+</div>
+<%- include('../partials/footer') %>

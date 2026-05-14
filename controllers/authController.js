@@ -1,27 +1,5 @@
-// Моковые пользователи (пароли открыты для простоты)
-const users = [
-	{
-		id: 1,
-		full_name: 'Клиент Иванов',
-		email: 'client@test.ru',
-		password: '123456',
-		role: 'client',
-	},
-	{
-		id: 2,
-		full_name: 'Сотрудник Петров',
-		email: 'employee@test.ru',
-		password: '123456',
-		role: 'employee',
-	},
-	{
-		id: 3,
-		full_name: 'Админ Сидоров',
-		email: 'admin@test.ru',
-		password: '123456',
-		role: 'admin',
-	},
-]
+const UserModel = require('../models/userModel')
+const passwordUtils = require('../utils/passwordUtils')
 
 exports.showLogin = (req, res) => {
 	res.render('auth/login', {
@@ -32,26 +10,65 @@ exports.showLogin = (req, res) => {
 	})
 }
 
-exports.login = (req, res) => {
-	const { email, password } = req.body
-	const user = users.find(u => u.email === email && u.password === password)
-	if (!user) {
-		return res.render('auth/login', {
-			title: 'Вход',
-			currentPage: 'login',
-			errors: [{ msg: 'Неверный email или пароль' }],
-			formData: req.body,
-		})
+exports.login = async (req, res) => {
+	try {
+		const { email, password } = req.body
+		const user = await UserModel.findByEmail(email)
+		if (!user) {
+			return res.render('auth/login', {
+				title: 'Вход',
+				currentPage: 'login',
+				errors: [{ msg: 'Неверный email или пароль' }],
+				formData: req.body,
+			})
+		}
+
+		// Проверка пароля
+		let isValid = false
+		if (user.password_hash && user.password_hash.startsWith('$2b$')) {
+			isValid = await passwordUtils.compare(password, user.password_hash)
+		} else {
+			// Временный открытый пароль — разрешаем и обновляем хэш
+			if (password === user.password_hash) {
+				const hashed = await passwordUtils.hash(password)
+				await UserModel.updatePasswordHash(user.user_id, hashed)
+				isValid = true
+			}
+		}
+
+		if (!isValid) {
+			return res.render('auth/login', {
+				title: 'Вход',
+				currentPage: 'login',
+				errors: [{ msg: 'Неверный email или пароль' }],
+				formData: req.body,
+			})
+		}
+
+		// Блокировка
+		if (user.is_blocked) {
+			return res.render('auth/login', {
+				title: 'Вход',
+				currentPage: 'login',
+				errors: [{ msg: 'Ваш аккаунт заблокирован' }],
+				formData: req.body,
+			})
+		}
+
+		req.session.user = {
+			id: user.user_id,
+			full_name: user.full_name,
+			email: user.email,
+			role: user.role,
+		}
+
+		const returnTo = req.session.returnTo || '/cars'
+		delete req.session.returnTo
+		res.redirect(returnTo)
+	} catch (error) {
+		console.error(error)
+		res.status(500).render('errors/500', { currentPage: '' })
 	}
-	req.session.user = {
-		id: user.id,
-		full_name: user.full_name,
-		email: user.email,
-		role: user.role,
-	}
-	const returnTo = req.session.returnTo || '/cars'
-	delete req.session.returnTo
-	res.redirect(returnTo)
 }
 
 exports.logout = (req, res) => {
@@ -67,23 +84,42 @@ exports.showRegister = (req, res) => {
 	})
 }
 
-exports.register = (req, res) => {
-	const { full_name, email, phone, password, driver_license_number } = req.body
-	// Проверка уникальности email (мок)
-	if (users.find(u => u.email === email)) {
-		return res.render('auth/register', {
-			title: 'Регистрация',
-			currentPage: 'register',
-			errors: [{ msg: 'Пользователь с таким email уже существует' }],
-			formData: req.body,
+exports.register = async (req, res) => {
+	try {
+		const { full_name, email, phone, password, driver_license_number } =
+			req.body
+
+		// Проверка уникальности email
+		const existing = await UserModel.findByEmail(email)
+		if (existing) {
+			return res.render('auth/register', {
+				title: 'Регистрация',
+				currentPage: 'register',
+				errors: [{ msg: 'Пользователь с таким email уже существует' }],
+				formData: req.body,
+			})
+		}
+
+		const hashed = await passwordUtils.hash(password)
+		const userId = await UserModel.create({
+			full_name,
+			email,
+			phone: phone || null,
+			password_hash: hashed,
+			driver_license_number: driver_license_number || null,
+			birth_date: null, // можно добавить поле в форму позже
 		})
+
+		// Автоматически логиним после регистрации
+		req.session.user = {
+			id: userId,
+			full_name,
+			email,
+			role: 'client',
+		}
+		res.redirect('/cars')
+	} catch (error) {
+		console.error(error)
+		res.status(500).render('errors/500', { currentPage: '' })
 	}
-	// В реальности здесь будет запись в БД; пока просто логиним
-	req.session.user = {
-		id: users.length + 1,
-		full_name,
-		email,
-		role: 'client',
-	}
-	res.redirect('/cars')
 }

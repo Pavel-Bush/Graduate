@@ -1,0 +1,17 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="max-width: 500px; padding: 24px 0;">
+    <h1>Оплата: <%= description %></h1>
+    <p>Сумма к оплате: <strong><%= amount.toLocaleString('ru-RU') %> ₽</strong></p>
+    <% if (amount > 0) { %>
+        <form action="/payments" method="POST">
+            <input type="hidden" name="rental_id" value="<%= rentalId %>">
+            <input type="hidden" name="amount" value="<%= amount %>">
+            <input type="hidden" name="payment_method" value="card">
+            <button type="submit" class="btn">Оплатить картой</button>
+        </form>
+    <% } else { %>
+        <p>Нет задолженности по этому типу.</p>
+    <% } %>
+</div>
+<%- include('../partials/footer') %>

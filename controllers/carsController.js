@@ -1,66 +1,51 @@
-// Моковые данные автомобилей
-const mockCars = [
-	{
-		id: 1,
-		brand: 'Toyota',
-		model: 'Camry',
-		body_type: 'sedan',
-		transmission: 'automatic',
-		fuel_type: 'petrol',
-		seats: 5,
-		price_per_day: 4500,
-		image: '/images/cars/camry.jpg',
-	},
-	{
-		id: 2,
-		brand: 'Volkswagen',
-		model: 'Polo',
-		body_type: 'hatchback',
-		transmission: 'manual',
-		fuel_type: 'petrol',
-		seats: 5,
-		price_per_day: 3200,
-		image: '/images/cars/polo.jpg',
-	},
-	{
-		id: 3,
-		brand: 'Hyundai',
-		model: 'Creta',
-		body_type: 'suv',
-		transmission: 'automatic',
-		fuel_type: 'diesel',
-		seats: 5,
-		price_per_day: 4000,
-		image: '/images/cars/creta.jpg',
-	},
-]
+const carAvailabilityService = require('../services/carAvailabilityService')
+const CarModel = require('../models/carModel')
 
-// Каталог
-exports.catalog = (req, res) => {
-	// В будущем здесь будет фильтрация по req.query и запрос к БД
-	res.render('cars/catalog', {
-		title: 'Каталог автомобилей',
-		currentPage: 'catalog',
-		cars: mockCars,
-		// Параметры фильтров можно передать пустыми
-		filters: {
-			brand: '',
-			body_type: '',
-			start_date: '',
-			end_date: '',
-		},
-	})
+exports.catalog = async (req, res) => {
+	try {
+		let { start_date, end_date } = req.query
+		let models
+
+		if (start_date && end_date && new Date(start_date) < new Date(end_date)) {
+			// Приводим к DATETIME: начало дня и конец дня
+			const startDt = start_date + ' 00:00:00'
+			const endDt = end_date + ' 23:59:59'
+			models = await carAvailabilityService.getAvailableModelsInPeriod(
+				startDt,
+				endDt,
+			)
+		} else {
+			models = await carAvailabilityService.getAllModels()
+		}
+
+		res.render('cars/catalog', {
+			title: 'Каталог автомобилей',
+			currentPage: 'catalog',
+			models,
+			filters: {
+				start_date: start_date || '',
+				end_date: end_date || '',
+			},
+		})
+	} catch (error) {
+		console.error(error)
+		res.status(500).render('errors/500', { currentPage: '' })
+	}
 }
 
-// Детальная страница
-exports.details = (req, res) => {
-	const car = mockCars.find(c => c.id === parseInt(req.params.id))
-	if (!car) {
-		return res.status(404).render('errors/404', { currentPage: '' })
+exports.details = async (req, res) => {
+	try {
+		const model = await CarModel.getModelById(req.params.id)
+		if (!model) {
+			return res.status(404).render('errors/404', { currentPage: '' })
+		}
+		res.render('cars/details', {
+			title: `${model.brand} ${model.model}`,
+			currentPage: 'catalog',
+			model,
+		})
+	} catch (error) {
+		console.error(error)
+		res.status(500).render('errors/500', { currentPage: '' })
 	}
-	res.render('cars/details', {
-		title: `${car.brand} ${car.model}`,
-		currentPage: 'catalog',
-		car,
-	})
 }

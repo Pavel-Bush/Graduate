@@ -1,0 +1,16 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="max-width: 500px; padding: 24px 0;">
+    <h1>Продление аренды</h1>
+    <p><%= rental.brand %> <%= rental.model %> (гос. номер <%= rental.license_plate %>)</p>
+    <p>Текущая дата окончания: <%= new Date(rental.end_datetime).toLocaleString() %></p>
+    <%- include('../partials/alerts') %>
+    <form method="POST" action="/rentals/<%= rental.id %>/extend">
+        <div class="form-group">
+            <label for="days">Количество дней продления</label>
+            <input type="number" class="form-control" id="days" name="days" min="1" required>
+        </div>
+        <button type="submit" class="btn">Продлить</button>
+    </form>
+</div>
+<%- include('../partials/footer') %>

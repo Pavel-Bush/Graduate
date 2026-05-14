@@ -1,0 +1,20 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="max-width: 500px; padding: 24px 0;">
+    <h1>Оплата аренды</h1>
+    <p><%= rental.brand %> <%= rental.model %> (гос. номер <%= rental.license_plate %>)</p>
+    <p>Сумма к оплате: <strong><%= amount.toLocaleString('ru-RU') %> ₽</strong></p>
+    <form action="/payments" method="POST">
+        <input type="hidden" name="rental_id" value="<%= rental.id %>">
+        <input type="hidden" name="amount" value="<%= amount %>">
+        <div class="form-group">
+            <label for="payment_method">Способ оплаты</label>
+            <select class="form-control" id="payment_method" name="payment_method" required>
+                <option value="cash">Наличные</option>
+                <option value="card">Карта</option>
+            </select>
+        </div>
+        <button type="submit" class="btn">Оплатить</button>
+    </form>
+</div>
+<%- include('../partials/footer') %>

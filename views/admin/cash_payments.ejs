@@ -1,0 +1,27 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="padding: 24px 0;">
+    <h1>Наличные платежи (ожидают подтверждения)</h1>
+    <% if (payments.length === 0) { %>
+        <p>Нет ожидающих платежей.</p>
+    <% } else { %>
+        <table style="width:100%; border-collapse: collapse;">
+            <tr style="border-bottom: 1px solid #ddd;">
+                <th>Платёж ID</th><th>Клиент</th><th>Сумма</th><th></th>
+            </tr>
+            <% payments.forEach(p => { %>
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td><%= p.id %></td>
+                    <td><%= p.full_name %></td>
+                    <td><%= p.amount %> ₽</td>
+                    <td>
+                        <form method="POST" action="/admin/cash-payments/<%= p.id %>/confirm">
+                            <button type="submit" class="btn">Подтвердить</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </table>
+    <% } %>
+</div>
+<%- include('../partials/footer') %>

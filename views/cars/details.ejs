@@ -1,26 +1,24 @@
 <%- include('../partials/head', { title: title }) %>
 <%- include('../partials/header') %>
 <div class="container" style="padding-top:24px; padding-bottom:24px;">
-    <h1><%= car.brand %> <%= car.model %></h1>
+    <h1><%= model.brand %> <%= model.model %></h1>
     <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-top:16px;">
         <div style="flex: 1 1 300px;">
-            <img src="<%= car.image %>" alt="<%= car.brand %> <%= car.model %>" style="width:100%; border-radius: var(--radius);" onerror="this.src='/images/placeholder.jpg'">
+            <!-- Изображение-заглушка -->
+            <img src="/images/placeholder.jpg" style="width:100%; border-radius: var(--radius);">
         </div>
         <div style="flex: 1 1 300px;">
             <h3>Характеристики</h3>
-            <p>Тип кузова: <%= car.body_type %></p>
-            <p>Коробка передач: <%= car.transmission %></p>
-            <p>Топливо: <%= car.fuel_type %></p>
-            <p>Мест: <%= car.seats %></p>
-            <p class="card-price" style="margin-top:16px;"><%= car.price_per_day.toLocaleString('ru-RU') %> ₽ / сутки</p>
-
+            <p>Тип кузова: <%= model.body_type %></p>
+            <p>Коробка передач: <%= model.transmission === 'automatic' ? 'Автомат' : 'Механика' %></p>
+            <p>Топливо: <%= model.fuel_type %></p>
+            <p>Мест: <%= model.seats %></p>
+            <p>Мощность: <%= model.engine_power || '—' %> л.с.</p>
+            <p class="card-price"><%= model.base_price_per_day.toLocaleString('ru-RU') %> ₽ / сутки</p>
             <% if (locals.user) { %>
-                <form action="/rentals/create" method="GET" style="margin-top:16px;">
-                    <input type="hidden" name="car_id" value="<%= car.id %>">
-                    <button type="submit" class="btn">Забронировать</button>
-                </form>
+                <a href="/rentals/create?model_id=<%= model.id %>" class="btn">Забронировать</a>
             <% } else { %>
-                <p style="margin-top:16px;"><a href="/auth/login">Войдите</a>, чтобы забронировать автомобиль.</p>
+                <p><a href="/auth/login">Войдите</a>, чтобы забронировать.</p>
             <% } %>
         </div>
     </div>

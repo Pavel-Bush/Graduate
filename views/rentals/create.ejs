@@ -1,0 +1,23 @@
+<%- include('../partials/head', { title: title }) %>
+<%- include('../partials/header') %>
+<div class="container" style="max-width: 500px; padding: 24px 0;">
+    <h1>Забронировать <%= model.brand %> <%= model.model %></h1>
+    <p><%= model.body_type %>, <%= model.transmission === 'automatic' ? 'Автомат' : 'Механика' %>, <%= model.fuel_type %></p>
+    <p class="card-price"><%= model.base_price_per_day.toLocaleString('ru-RU') %> ₽ / сутки</p>
+    <%- include('../partials/alerts') %>
+    <form action="/rentals/create" method="POST">
+        <input type="hidden" name="model_id" value="<%= model.id %>">
+        <div class="form-group">
+            <label for="start_datetime">Дата и время начала</label>
+            <input type="datetime-local" id="start_datetime" name="start_datetime" class="form-control"
+                   value="<%= typeof formData.start_datetime !== 'undefined' ? formData.start_datetime : '' %>" required>
+        </div>
+        <div class="form-group">
+            <label for="end_datetime">Дата и время окончания</label>
+            <input type="datetime-local" id="end_datetime" name="end_datetime" class="form-control"
+                   value="<%= typeof formData.end_datetime !== 'undefined' ? formData.end_datetime : '' %>" required>
+        </div>
+        <button type="submit" class="btn" style="width:100%;">Забронировать</button>
+    </form>
+</div>
+<%- include('../partials/footer') %>

@@ -59,7 +59,8 @@ CREATE TABLE car_models (
     min_experience INT DEFAULT 0,
     required_license_category VARCHAR(10),
     min_age INT DEFAULT 18,
-    description TEXT
+    description TEXT,
+    base_price_per_day DECIMAL(10,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB;
 
 -- Автомобили (статусы: available, service)
@@ -85,6 +86,8 @@ CREATE TABLE rentals (
     car_id BIGINT UNSIGNED NOT NULL,
     start_datetime DATETIME NOT NULL,
     end_datetime DATETIME NOT NULL,
+    actual_end_datetime DATETIME NULL,
+    blocked_until DATETIME NULL,
     status ENUM('pending', 'paid', 'active', 'completed', 'cancelled', 'expired') NOT NULL DEFAULT 'pending',
     total_price DECIMAL(10,2) NOT NULL DEFAULT 0.00,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -150,7 +153,6 @@ CREATE TABLE rental_services (
     quantity DECIMAL(10,2) NOT NULL DEFAULT 1.00,
     CONSTRAINT fk_rental_services_rental FOREIGN KEY (rental_id) REFERENCES rentals(id) ON DELETE CASCADE,
     CONSTRAINT fk_rental_services_service FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE RESTRICT,
-    UNIQUE KEY uk_rental_service (rental_id, service_id),
     INDEX idx_rental_services_rental (rental_id),
     INDEX idx_rental_services_service (service_id),
     CONSTRAINT chk_rental_service_price CHECK (unit_price >= 0),

@@ -7,7 +7,7 @@
         <a href="/rentals/history" class="btn-outline">История</a>
     </div>
     <% if (rentals.length === 0) { %>
-        <p>У вас нет активных аренд.</p>
+        <p>У вас нет завершённых аренд.</p>
     <% } else { %>
         <% rentals.forEach(rental => { %>
             <div class="card" style="margin-bottom: 16px;">
@@ -15,17 +15,9 @@
                 <div class="card-text"><%= new Date(rental.start_datetime).toLocaleString() %> — <%= new Date(rental.end_datetime).toLocaleString() %></div>
                 <div class="card-text">Статус: <%= rental.status %></div>
                 <div class="card-price"><%= rental.total_price.toLocaleString('ru-RU') %> ₽</div>
-                <% if (rental.status === 'pending') { %>
-                    <a href="/rentals/<%= rental.id %>/pay" class="btn">Оплатить</a>
-                    <form action="/rentals/cancel/<%= rental.id %>" method="POST" style="display:inline;">
-                        <button type="submit" class="btn-outline">Отменить</button>
-                    </form>
-                <% } %>
-                <% if (rental.status === 'active') { %>
-                    <a href="/rentals/<%= rental.id %>/extend" class="btn-outline">Продлить</a>
-                <% } %>
-                <% if (['pending', 'paid', 'active'].includes(rental.status)) { %>
-                    <a href="/rentals/<%= rental.id %>/services" class="btn-outline">Доп. услуги</a>
+                <% if (rental.status === 'completed') { %>
+                    <a href="/rentals/<%= rental.id %>/pay-services" class="btn-outline">Оплатить услуги</a>
+                    <a href="/rentals/<%= rental.id %>/pay-fines" class="btn-outline">Оплатить штрафы</a>
                 <% } %>
             </div>
         <% }) %>
