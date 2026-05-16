@@ -86,8 +86,17 @@ exports.showRegister = (req, res) => {
 
 exports.register = async (req, res) => {
 	try {
-		const { full_name, email, phone, password, driver_license_number } =
-			req.body
+		const {
+			full_name,
+			email,
+			phone,
+			password,
+			driver_license_number,
+			license_issue_date,
+		} = req.body
+		const driver_license_upper = driver_license_number
+			? driver_license_number.toUpperCase()
+			: null
 
 		// Проверка уникальности email
 		const existing = await UserModel.findByEmail(email)
@@ -106,11 +115,11 @@ exports.register = async (req, res) => {
 			email,
 			phone: phone || null,
 			password_hash: hashed,
-			driver_license_number: driver_license_number || null,
-			birth_date: null, // можно добавить поле в форму позже
+			driver_license_number: driver_license_upper,
+			license_issue_date: license_issue_date || null,
+			license_categories: JSON.stringify(['B']),
 		})
 
-		// Автоматически логиним после регистрации
 		req.session.user = {
 			id: userId,
 			full_name,

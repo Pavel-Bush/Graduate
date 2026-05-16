@@ -5,6 +5,7 @@
     <p><%= rental.brand %> <%= rental.model %> (гос. номер <%= rental.license_plate %>)</p>
     <p>Сумма к оплате: <strong><%= amount.toLocaleString('ru-RU') %> ₽</strong></p>
     <form action="/payments" method="POST">
+        <input type="hidden" name="payment_type" value="rental">
         <input type="hidden" name="rental_id" value="<%= rental.id %>">
         <input type="hidden" name="amount" value="<%= amount %>">
         <div class="form-group">

@@ -2,23 +2,22 @@ const rentalsService = require('../services/rentalsService')
 const CarModel = require('../models/carModel')
 const { toMySQLDatetime } = require('../utils/dateUtils')
 const rentalServicesService = require('../services/rentalServicesService')
+const carAvailabilityService = require('../services/carAvailabilityService')
 const ServiceModel = require('../models/serviceModel')
 
 // Показать форму создания бронирования
 exports.showCreateForm = async (req, res) => {
 	try {
 		const modelId = req.query.model_id
-		if (!modelId) {
-			return res.redirect('/cars')
-		}
+		if (!modelId) return res.redirect('/cars')
 		const model = await CarModel.getModelById(modelId)
-		if (!model) {
-			return res.status(404).render('errors/404', { currentPage: '' })
-		}
+		if (!model) return res.status(404).render('errors/404', { currentPage: '' })
+		const locations = await carAvailabilityService.getLocationsForModel(modelId)
 		res.render('rentals/create', {
 			title: `Забронировать ${model.brand} ${model.model}`,
 			currentPage: 'catalog',
 			model,
+			locations,
 			errors: [],
 			formData: {},
 		})
@@ -30,22 +29,24 @@ exports.showCreateForm = async (req, res) => {
 
 exports.createRental = async (req, res) => {
 	try {
-		const { model_id, start_datetime, end_datetime } = req.body
+		const { model_id, start_datetime, end_datetime, location_id } = req.body
 		const model = await CarModel.getModelById(model_id)
 		if (!model) {
 			return res.status(404).render('errors/404', { currentPage: '' })
 		}
 
-		// Преобразуем даты к формату MySQL
+		const { toMySQLDatetime } = require('../utils/dateUtils')
 		const startDt = toMySQLDatetime(start_datetime)
 		const endDt = toMySQLDatetime(end_datetime)
+		const locations =
+			await carAvailabilityService.getLocationsForModel(model_id)
 
-		// Валидация дат
 		if (!startDt || !endDt || new Date(startDt) >= new Date(endDt)) {
 			return res.render('rentals/create', {
 				title: `Забронировать ${model.brand} ${model.model}`,
 				currentPage: 'catalog',
 				model,
+				locations,
 				errors: [{ msg: 'Некорректные даты аренды' }],
 				formData: req.body,
 			})
@@ -55,7 +56,18 @@ exports.createRental = async (req, res) => {
 				title: `Забронировать ${model.brand} ${model.model}`,
 				currentPage: 'catalog',
 				model,
+				locations,
 				errors: [{ msg: 'Дата начала не может быть в прошлом' }],
+				formData: req.body,
+			})
+		}
+		if (!location_id) {
+			return res.render('rentals/create', {
+				title: `Забронировать ${model.brand} ${model.model}`,
+				currentPage: 'catalog',
+				model,
+				locations,
+				errors: [{ msg: 'Выберите пункт выдачи' }],
 				formData: req.body,
 			})
 		}
@@ -65,16 +77,22 @@ exports.createRental = async (req, res) => {
 			parseInt(model_id),
 			startDt,
 			endDt,
+			parseInt(location_id),
 		)
 
 		res.redirect('/rentals/active')
 	} catch (error) {
 		console.error(error)
-		const model = await CarModel.getModelById(req.body.model_id)
+		const model_id = req.body.model_id // берём из запроса
+		const model = model_id ? await CarModel.getModelById(model_id) : null
+		const locations = model_id
+			? await carAvailabilityService.getLocationsForModel(model_id)
+			: []
 		res.render('rentals/create', {
 			title: model ? `Забронировать ${model.brand} ${model.model}` : 'Ошибка',
 			currentPage: 'catalog',
 			model: model || {},
+			locations,
 			errors: [{ msg: error.message || 'Ошибка при создании бронирования' }],
 			formData: req.body,
 		})
@@ -83,6 +101,7 @@ exports.createRental = async (req, res) => {
 
 // Активные аренды пользователя
 exports.showActiveRentals = async (req, res) => {
+	await rentalsService.expireStaleBookings()
 	const rentals = await rentalsService.getActiveRentalsByUser(
 		req.session.user.id,
 	)
@@ -182,7 +201,11 @@ exports.saveServices = async (req, res) => {
 				if (quantity > 0) servicesData.push({ service_id: serviceId, quantity })
 			}
 		}
-		await rentalServicesService.saveServices(rental.id, servicesData)
+		await rentalServicesService.saveServices(
+			rental.id,
+			servicesData,
+			req.session.user.id,
+		)
 		res.redirect('/rentals/active')
 	} catch (error) {
 		const rental = await rentalsService.getRentalById(req.params.id)
@@ -234,5 +257,27 @@ exports.extendRental = async (req, res) => {
 			rental,
 			errors: [{ msg: error.message }],
 		})
+	}
+}
+
+exports.showDetails = async (req, res) => {
+	try {
+		const rental = await rentalsService.getRentalDetails(
+			req.params.id,
+			req.session.user.id,
+		)
+		if (!rental) {
+			return res.status(404).render('errors/404', { currentPage: '' })
+		}
+		// Если аренда не завершена или не отменена, возможно, тоже показывать, но по условию – только завершённые
+		// Но пусть клиент смотрит любую свою аренду. Ограничивать не будем, чтобы страница работала и для активных.
+		res.render('rentals/details', {
+			title: `Аренда #${rental.id}`,
+			currentPage: 'rentals',
+			rental,
+		})
+	} catch (error) {
+		console.error(error)
+		res.status(500).render('errors/500', { currentPage: '' })
 	}
 }

@@ -2,22 +2,32 @@
 <%- include('../partials/header') %>
 <div class="container" style="padding: 24px 0;">
     <h1>Мои аренды</h1>
-    <div style="margin-bottom: 16px;">
-        <a href="/rentals/active" class="btn-outline">Активные</a>
-        <a href="/rentals/history" class="btn-outline">История</a>
+    <div class="tab-nav">
+        <a href="/rentals/active">Активные</a>
+        <a href="/rentals/history" class="active">История</a>
     </div>
     <% if (rentals.length === 0) { %>
         <p>У вас нет завершённых аренд.</p>
     <% } else { %>
         <% rentals.forEach(rental => { %>
             <div class="card" style="margin-bottom: 16px;">
-                <div class="card-title"><%= rental.brand %> <%= rental.model %> (гос. номер <%= rental.license_plate %>)</div>
-                <div class="card-text"><%= new Date(rental.start_datetime).toLocaleString() %> — <%= new Date(rental.end_datetime).toLocaleString() %></div>
+                <div class="card-title">
+                 <a href="/rentals/<%= rental.id %>"><%= rental.brand %> <%= rental.model %> (гос. номер <%= rental.license_plate %>)</a></div>
+                <div class="card-text">
+                    <%= new Date(rental.start_datetime).toLocaleString() %> — <%= new Date(rental.end_datetime).toLocaleString() %>
+                </div>
+                <% if (rental.location_name) { %>
+                    <div class="card-text" style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Пункт выдачи: <%= rental.location_name %>
+                    </div>
+                <% } %>
                 <div class="card-text">Статус: <%= rental.status %></div>
                 <div class="card-price"><%= rental.total_price.toLocaleString('ru-RU') %> ₽</div>
                 <% if (rental.status === 'completed') { %>
-                    <a href="/rentals/<%= rental.id %>/pay-services" class="btn-outline">Оплатить услуги</a>
-                    <a href="/rentals/<%= rental.id %>/pay-fines" class="btn-outline">Оплатить штрафы</a>
+                    <div class="actions">
+                        <a href="/rentals/<%= rental.id %>/pay-services" class="btn-outline">Оплатить услуги</a>
+                        <a href="/rentals/<%= rental.id %>/pay-fines" class="btn-outline">Оплатить штрафы</a>
+                    </div>
                 <% } %>
             </div>
         <% }) %>

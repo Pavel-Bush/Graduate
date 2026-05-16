@@ -2,6 +2,7 @@
     <a href="/" class="navbar-brand">Rentaluxe</a>
     <ul class="navbar-nav">
         <li><a href="/cars" class="<%= currentPage === 'catalog' ? 'active' : '' %>">Каталог</a></li>
+        <li><a href="/locations" class="<%= currentPage === 'locations' ? 'active' : '' %>">Локации</a></li>
         <% if (locals.user) { %>
             <li><a href="/rentals/active" class="<%= currentPage === 'rentals' ? 'active' : '' %>">Мои аренды</a></li>
             <li><a href="/profile" class="<%= currentPage === 'profile' ? 'active' : '' %>">Профиль</a></li>

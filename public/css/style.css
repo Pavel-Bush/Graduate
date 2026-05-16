@@ -69,14 +69,31 @@ a:hover {
 	opacity: 0.6;
 	cursor: not-allowed;
 }
+
+/* Контурная кнопка */
 .btn-outline {
 	background: transparent;
 	color: var(--accent);
 	border: 1px solid var(--accent);
+	padding: 8px 16px;
+	border-radius: var(--radius);
+	font-size: 1rem;
+	cursor: pointer;
+	text-decoration: none;
+	display: inline-block;
+	text-align: center;
+	transition:
+		background 0.2s,
+		color 0.2s;
 }
 .btn-outline:hover {
 	background: var(--accent);
 	color: #fff;
+	text-decoration: none;
+}
+.btn-outline:disabled {
+	opacity: 0.5;
+	cursor: not-allowed;
 }
 
 /* Формы */
@@ -108,12 +125,11 @@ a:hover {
 	background: var(--bg-primary);
 	border-radius: 12px;
 	box-shadow: var(--shadow);
-	padding: 20px;
+	overflow: hidden;
 	transition:
 		transform 0.2s,
 		box-shadow 0.2s;
 }
-
 .card:hover {
 	transform: translateY(-2px);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -133,12 +149,32 @@ a:hover {
 	font-size: 1.1rem;
 }
 
-/* Сетка карточек */
+/* Кружочки цвета уже в инлайн-стилях, можно добавить общие */
+.color-dot {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	border: 1px solid #ccc;
+}
+
+.color-circle {
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
+}
+.color-circle:hover {
+	transform: scale(1.2);
+	box-shadow: 0 0 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Сетка для всех карточек (каталог, локации) */
 .grid {
 	display: grid;
 	grid-template-columns: repeat(3, 1fr);
 	gap: 24px;
 }
+
 @media (max-width: 992px) {
 	.grid {
 		grid-template-columns: repeat(2, 1fr);
@@ -148,6 +184,34 @@ a:hover {
 	.grid {
 		grid-template-columns: 1fr;
 	}
+}
+
+/* Общие стили карточек */
+.card {
+	background: var(--bg-primary);
+	border-radius: 12px;
+	box-shadow: var(--shadow);
+	padding: 20px;
+	transition:
+		transform 0.2s,
+		box-shadow 0.2s;
+	display: flex;
+	flex-direction: column;
+}
+.card:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.card-title {
+	font-size: 1.2rem;
+	font-weight: 600;
+	margin-bottom: 8px;
+	color: var(--text-primary);
+}
+.card-text {
+	color: var(--text-secondary);
+	font-size: 0.95rem;
+	line-height: 1.4;
 }
 
 /* Навигация */
@@ -211,8 +275,18 @@ a:hover {
 	min-width: 180px;
 }
 .filters .btn {
-	height: fit-content;
 	flex: 0 0 auto;
+}
+
+.btn-secondary {
+	background: #6b7280;
+	color: #fff;
+	transition: background 0.2s;
+}
+.btn-secondary:hover {
+	background: #4b5563;
+	text-decoration: none;
+	color: #fff;
 }
 
 /* Адаптив */
@@ -230,4 +304,89 @@ a:hover {
 	.filters {
 		flex-direction: column;
 	}
+}
+
+/* Детальная страница автомобиля */
+.car-detail {
+	display: flex;
+	gap: 32px;
+	flex-wrap: wrap;
+}
+.car-detail__image {
+	flex: 1 1 400px;
+	min-width: 280px;
+}
+.car-detail__image img {
+	width: 100%;
+	border-radius: var(--radius);
+	object-fit: cover;
+	max-height: 400px;
+}
+.car-detail__info {
+	flex: 1 1 300px;
+}
+.car-detail__info h1 {
+	font-size: 1.8rem;
+	margin-bottom: 4px;
+}
+.car-detail__price {
+	font-size: 1.5rem;
+	font-weight: 700;
+	color: var(--accent);
+	margin-bottom: 20px;
+}
+.car-detail__specs {
+	list-style: none;
+	padding: 0;
+	margin: 0 0 24px 0;
+	border-top: 1px solid var(--border);
+}
+.car-detail__specs li {
+	display: flex;
+	justify-content: space-between;
+	padding: 8px 0;
+	border-bottom: 1px solid var(--border);
+	font-size: 0.95rem;
+}
+.car-detail__specs li span:first-child {
+	color: var(--text-secondary);
+}
+.car-detail__specs li span:last-child {
+	font-weight: 500;
+	text-align: right;
+}
+.car-detail__action {
+	margin-top: 8px;
+}
+
+/* Группа кнопок в строке с отступами */
+.actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	margin-top: 8px;
+}
+
+/* Вкладки */
+.tab-nav {
+	display: flex;
+	gap: 8px;
+	margin-bottom: 16px;
+}
+.tab-nav a {
+	display: inline-block;
+	padding: 8px 16px;
+	border-radius: var(--radius);
+	font-weight: 500;
+	color: var(--text-secondary);
+	background: var(--bg-secondary);
+	text-decoration: none;
+	transition:
+		background 0.2s,
+		color 0.2s;
+}
+.tab-nav a.active,
+.tab-nav a:hover {
+	background: var(--accent);
+	color: #fff;
 }

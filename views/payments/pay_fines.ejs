@@ -5,6 +5,7 @@
     <p>Сумма к оплате: <strong><%= amount.toLocaleString('ru-RU') %> ₽</strong></p>
     <% if (amount > 0) { %>
         <form action="/payments" method="POST">
+            <input type="hidden" name="payment_type" value="<%= description === 'штрафы' ? 'fines' : 'services' %>">
             <input type="hidden" name="rental_id" value="<%= rentalId %>">
             <input type="hidden" name="amount" value="<%= amount %>">
             <input type="hidden" name="payment_method" value="card">

@@ -14,11 +14,22 @@
         </div>
         <div class="form-group">
             <label for="phone">Телефон</label>
-            <input type="tel" id="phone" name="phone" class="form-control" value="<%= typeof formData !== 'undefined' ? formData.phone || '' : '' %>">
+            <input type="tel" id="phone" name="phone" class="form-control" 
+                value="<%= typeof formData !== 'undefined' ? formData.phone || '' : '' %>"
+                placeholder="+375XXXXXXXXX или 80XXXXXXXXX">
+            <small style="color: var(--text-secondary);">В международном формате (+375) или внутреннем (80) с 9 цифрами</small>
         </div>
         <div class="form-group">
             <label for="driver_license_number">Номер водительского удостоверения</label>
-            <input type="text" id="driver_license_number" name="driver_license_number" class="form-control" value="<%= typeof formData !== 'undefined' ? formData.driver_license_number || '' : '' %>">
+            <input type="text" id="driver_license_number" name="driver_license_number" class="form-control" 
+                value="<%= typeof formData !== 'undefined' ? formData.driver_license_number || '' : '' %>"
+                placeholder="1АА123456">
+            <small style="color: var(--text-secondary);">9 знаков: цифра, 2 буквы (рус.), 6 цифр</small>
+        </div>
+        <div class="form-group">
+            <label for="license_issue_date">Дата выдачи ВУ</label>
+            <input type="date" id="license_issue_date" name="license_issue_date" class="form-control" 
+                value="<%= typeof formData !== 'undefined' ? formData.license_issue_date || '' : '' %>">
         </div>
         <div class="form-group">
             <label for="password">Пароль</label>

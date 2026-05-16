@@ -1,26 +1,91 @@
 <%- include('../partials/head', { title: title }) %>
 <%- include('../partials/header') %>
-<div class="container" style="padding-top:24px; padding-bottom:24px;">
-    <h1><%= model.brand %> <%= model.model %></h1>
-    <div style="display: flex; gap: 24px; flex-wrap: wrap; margin-top:16px;">
-        <div style="flex: 1 1 300px;">
-            <!-- Изображение-заглушка -->
-            <img src="/images/placeholder.jpg" style="width:100%; border-radius: var(--radius);">
-        </div>
-        <div style="flex: 1 1 300px;">
-            <h3>Характеристики</h3>
-            <p>Тип кузова: <%= model.body_type %></p>
-            <p>Коробка передач: <%= model.transmission === 'automatic' ? 'Автомат' : 'Механика' %></p>
-            <p>Топливо: <%= model.fuel_type %></p>
-            <p>Мест: <%= model.seats %></p>
-            <p>Мощность: <%= model.engine_power || '—' %> л.с.</p>
-            <p class="card-price"><%= model.base_price_per_day.toLocaleString('ru-RU') %> ₽ / сутки</p>
-            <% if (locals.user) { %>
-                <a href="/rentals/create?model_id=<%= model.id %>" class="btn">Забронировать</a>
-            <% } else { %>
-                <p><a href="/auth/login">Войдите</a>, чтобы забронировать.</p>
+<div class="container" style="padding: 32px 0;">
+    <div class="car-detail">
+        <div class="car-detail__image">
+            <img id="car-image" src="/images/cars/<%= model.image || 'placeholder.png' %>" alt="<%= model.brand %> <%= model.model %>" onerror="this.src='/images/placeholder.png'">
+            <% if (colors.length > 0) { %>
+                <div style="display: flex; gap: 12px; margin-top: 16px; justify-content: center; align-items: center;">
+                    <% colors.forEach(color => { 
+                        let hex = '#ccc';
+                        const c = color.trim().toLowerCase();
+                        if (c === 'белый') hex = '#ffffff';
+                        else if (c === 'чёрный') hex = '#000000';
+                        else if (c === 'синий') hex = '#1e3a5f';
+                        else if (c === 'красный') hex = '#c62828';
+                        else if (c === 'серый') hex = '#808080';
+                        // Добавь другие цвета при необходимости
+                    %>
+                        <span class="color-circle" 
+                              style="background-color: <%= hex %>; width: 30px; height: 30px; border-radius: 50%; cursor: pointer; border: 2px solid <%= hex === '#ffffff' ? '#aaa' : 'transparent' %>;"
+                              data-color="<%= color %>" 
+                              title="<%= color %>"
+                              onclick="changeCarImage(this)"></span>
+                    <% }) %>
+                </div>
             <% } %>
+        </div>
+        <div class="car-detail__info">
+            <h1><%= model.brand %> <%= model.model %></h1>
+            <div class="car-detail__price"><%= model.base_price_per_day.toLocaleString('ru-RU') %> ₽ / сутки</div>
+            <ul class="car-detail__specs">
+                <li><span>Тип кузова</span><span><%= model.body_type %></span></li>
+                <li><span>Коробка передач</span><span><%= model.transmission === 'automatic' ? 'Автомат' : 'Механика' %></span></li>
+                <li><span>Топливо</span><span><%= model.fuel_type %></span></li>
+                <li><span>Объём двигателя</span><span><%= model.engine_volume ? model.engine_volume + ' л' : '—' %></span></li>
+                <li><span>Мощность</span><span><%= model.engine_power ? model.engine_power + ' л.с.' : '—' %></span></li>
+                <li><span>Расход топлива</span><span><%= model.fuel_consumption ? model.fuel_consumption + ' л/100км' : '—' %></span></li>
+                <li><span>Привод</span><span><%= model.drive_type ? model.drive_type.toUpperCase() : '—' %></span></li>
+                <li><span>Количество мест</span><span><%= model.seats || '—' %></span></li>
+                <li><span>Кондиционер</span><span><%= model.has_ac ? 'Есть' : 'Нет' %></span></li>
+                <li><span>Bluetooth</span><span><%= model.has_bluetooth ? 'Есть' : 'Нет' %></span></li>
+                <li><span>Подогрев сидений</span><span><%= model.has_seat_heating ? 'Есть' : 'Нет' %></span></li>
+                <li><span>Парктроники</span><span><%= model.has_parking_sensors ? 'Есть' : 'Нет' %></span></li>
+                <% if (model.min_age && model.min_age > 18) { %>
+                    <li><span>Мин. возраст арендатора</span><span><%= model.min_age %> лет</span></li>
+                <% } %>
+                <% if (model.min_experience && model.min_experience > 0) { %>
+                    <li><span>Мин. стаж вождения</span><span><%= model.min_experience %> г.</span></li>
+                <% } %>
+                <% if (model.required_license_category && model.required_license_category !== 'B') { %>
+                    <li><span>Требуемая категория прав</span><span><%= model.required_license_category.replace('_AT', ' (автомат)') %></span></li>
+                <% } %>
+            </ul>
+            <% if (locations.length > 0) { %>
+                <h3 style="margin-top: 20px;">Доступен в локациях</h3>
+                <ul style="list-style: none; padding: 0;">
+                    <% locations.forEach(loc => { %>
+                        <li><%= loc.name %> (<%= loc.address %>)</li>
+                    <% }) %>
+                </ul>
+            <% } %>
+            <div class="car-detail__action">
+                <% if (locals.user) { %>
+                    <a href="/rentals/create?model_id=<%= model.id %>" class="btn" style="padding: 12px 24px; font-size: 1.1rem;">Забронировать</a>
+                <% } else { %>
+                    <p style="margin-bottom: 8px;">Чтобы забронировать автомобиль, необходимо войти в систему.</p>
+                    <a href="/auth/login" class="btn">Войти</a>
+                <% } %>
+            </div>
         </div>
     </div>
 </div>
 <%- include('../partials/footer') %>
+
+<script>
+    function changeCarImage(element) {
+        var color = element.getAttribute('data-color').trim().toLowerCase();
+        var baseImage = '<%= model.image %>' || 'placeholder.png';
+        // Извлекаем имя без расширения
+        var baseName = baseImage.replace(/\.[^/.]+$/, "");
+        var ext = baseImage.includes('.') ? baseImage.split('.').pop() : 'jpg';
+        var newSrc = '/images/cars/' + baseName + '_' + color + '.' + ext;
+        var img = document.getElementById('car-image');
+        var fallback = '/images/cars/' + baseImage;
+        img.src = newSrc;
+        img.onerror = function() {
+            img.src = fallback;
+            img.onerror = function() { img.src = '/images/placeholder.png'; };
+        };
+    }
+</script>

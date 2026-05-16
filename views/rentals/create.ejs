@@ -8,6 +8,15 @@
     <form action="/rentals/create" method="POST">
         <input type="hidden" name="model_id" value="<%= model.id %>">
         <div class="form-group">
+            <label for="location_id">Пункт выдачи</label>
+            <select class="form-control" id="location_id" name="location_id" required>
+                <option value="">Выберите локацию</option>
+                <% locations.forEach(loc => { %>
+                    <option value="<%= loc.id %>" <%= formData.location_id == loc.id ? 'selected' : '' %>><%= loc.name %> (<%= loc.address %>)</option>
+                <% }) %>
+            </select>
+        </div>
+        <div class="form-group">
             <label for="start_datetime">Дата и время начала</label>
             <input type="datetime-local" id="start_datetime" name="start_datetime" class="form-control"
                    value="<%= typeof formData.start_datetime !== 'undefined' ? formData.start_datetime : '' %>" required>

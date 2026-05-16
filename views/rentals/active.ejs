@@ -2,31 +2,42 @@
 <%- include('../partials/header') %>
 <div class="container" style="padding: 24px 0;">
     <h1>Мои аренды</h1>
-    <div style="margin-bottom: 16px;">
-        <a href="/rentals/active" class="btn-outline">Активные</a>
-        <a href="/rentals/history" class="btn-outline">История</a>
+    <div class="tab-nav">
+        <a href="/rentals/active" class="active">Активные</a>
+        <a href="/rentals/history">История</a>
     </div>
     <% if (rentals.length === 0) { %>
         <p>У вас нет активных аренд.</p>
     <% } else { %>
         <% rentals.forEach(rental => { %>
             <div class="card" style="margin-bottom: 16px;">
-                <div class="card-title"><%= rental.brand %> <%= rental.model %> (гос. номер <%= rental.license_plate %>)</div>
-                <div class="card-text"><%= new Date(rental.start_datetime).toLocaleString() %> — <%= new Date(rental.end_datetime).toLocaleString() %></div>
+                <div class="card-title">
+                 <a href="/rentals/<%= rental.id %>"><%= rental.brand %> <%= rental.model %> (гос. номер <%= rental.license_plate %>)</a>
+                </div>
+                <div class="card-text">
+                    <%= new Date(rental.start_datetime).toLocaleString() %> — <%= new Date(rental.end_datetime).toLocaleString() %>
+                </div>
+                <% if (rental.location_name) { %>
+                    <div class="card-text" style="font-size: 0.9rem; color: var(--text-secondary);">
+                        Пункт выдачи: <%= rental.location_name %>
+                    </div>
+                <% } %>
                 <div class="card-text">Статус: <%= rental.status %></div>
                 <div class="card-price"><%= rental.total_price.toLocaleString('ru-RU') %> ₽</div>
-                <% if (rental.status === 'pending') { %>
-                    <a href="/rentals/<%= rental.id %>/pay" class="btn">Оплатить</a>
-                    <form action="/rentals/cancel/<%= rental.id %>" method="POST" style="display:inline;">
-                        <button type="submit" class="btn-outline">Отменить</button>
-                    </form>
-                <% } %>
-                <% if (rental.status === 'active') { %>
-                    <a href="/rentals/<%= rental.id %>/extend" class="btn-outline">Продлить</a>
-                <% } %>
-                <% if (['pending', 'paid', 'active'].includes(rental.status)) { %>
-                    <a href="/rentals/<%= rental.id %>/services" class="btn-outline">Доп. услуги</a>
-                <% } %>
+                <div class="actions">
+                    <% if (rental.status === 'pending') { %>
+                        <a href="/rentals/<%= rental.id %>/pay" class="btn">Оплатить</a>
+                        <form action="/rentals/cancel/<%= rental.id %>" method="POST" style="margin:0;">
+                            <button type="submit" class="btn-outline">Отменить</button>
+                        </form>
+                    <% } %>
+                    <% if (rental.status === 'active') { %>
+                        <a href="/rentals/<%= rental.id %>/extend" class="btn-outline">Продлить</a>
+                    <% } %>
+                    <% if (['pending', 'paid', 'active'].includes(rental.status)) { %>
+                        <a href="/rentals/<%= rental.id %>/services" class="btn-outline">Доп. услуги</a>
+                    <% } %>
+                </div>
             </div>
         <% }) %>
     <% } %>

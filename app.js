@@ -10,6 +10,7 @@ const paymentRoutes = require('./routes/paymentRoutes')
 const carsRoutes = require('./routes/carsRoutes')
 const adminRoutes = require('./routes/adminRoutes')
 const profileRoutes = require('./routes/profileRoutes')
+const locationsRoutes = require('./routes/locationsRoutes')
 
 const app = express()
 
@@ -51,6 +52,7 @@ app.use('/payments', paymentRoutes)
 app.use('/cars', carsRoutes)
 app.use('/admin', adminRoutes)
 app.use('/profile', profileRoutes)
+app.use('/locations', locationsRoutes)
 
 // Главная страница
 app.get('/', (req, res) => {

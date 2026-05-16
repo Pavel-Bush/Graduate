@@ -11,7 +11,8 @@ CREATE TABLE users (
     password_hash VARCHAR(255) NOT NULL,
     role ENUM('client', 'employee', 'admin') NOT NULL DEFAULT 'client',
     driver_license_number VARCHAR(50) UNIQUE,
-    license_category VARCHAR(10),
+    license_issue_date DATE NULL,
+    license_categories JSON NULL,
     birth_date DATE,
     is_blocked BOOLEAN NOT NULL DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
@@ -36,6 +37,8 @@ CREATE TABLE locations (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     address VARCHAR(255),
+    latitude DECIMAL(10,7) NULL,
+    longitude DECIMAL(10,7) NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB;
 
@@ -58,8 +61,8 @@ CREATE TABLE car_models (
     has_parking_sensors BOOLEAN NOT NULL DEFAULT FALSE,
     min_experience INT DEFAULT 0,
     required_license_category VARCHAR(10),
-    min_age INT DEFAULT 18,
     description TEXT,
+    image VARCHAR(255) NULL,
     base_price_per_day DECIMAL(10,2) NOT NULL DEFAULT 0.00
 ) ENGINE=InnoDB;
 
@@ -141,6 +144,7 @@ CREATE TABLE services (
     description TEXT,
     base_price DECIMAL(10,2) NOT NULL,
     unit_type ENUM('piece', 'day', 'hour') NOT NULL DEFAULT 'piece',
+    required_license_category VARCHAR(10) NULL,
     CONSTRAINT chk_service_price CHECK (base_price >= 0)
 ) ENGINE=InnoDB;
 
@@ -151,6 +155,7 @@ CREATE TABLE rental_services (
     service_id BIGINT UNSIGNED NOT NULL,
     unit_price DECIMAL(10,2) NOT NULL,
     quantity DECIMAL(10,2) NOT NULL DEFAULT 1.00,
+    is_paid TINYINT(1) NOT NULL DEFAULT 0,
     CONSTRAINT fk_rental_services_rental FOREIGN KEY (rental_id) REFERENCES rentals(id) ON DELETE CASCADE,
     CONSTRAINT fk_rental_services_service FOREIGN KEY (service_id) REFERENCES services(id) ON DELETE RESTRICT,
     INDEX idx_rental_services_rental (rental_id),

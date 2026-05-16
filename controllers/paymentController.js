@@ -19,29 +19,40 @@ exports.showPaymentForm = async (req, res) => {
 
 exports.processPayment = async (req, res) => {
 	try {
-		const { rental_id, amount, payment_method } = req.body
+		const { rental_id, amount, payment_method, payment_type } = req.body
 		await paymentService.processPayment(
 			rental_id,
 			req.session.user.id,
 			amount,
 			payment_method || 'card',
+			payment_type || 'rental',
 		)
-		res.redirect('/rentals/active')
+
+		// Перенаправление в зависимости от типа
+		if (payment_type === 'services' || payment_type === 'fines') {
+			// Возвращаемся на историю аренд (или можно на активные, если услуги ещё не завершены)
+			res.redirect('/rentals/history')
+		} else {
+			res.redirect('/rentals/active')
+		}
 	} catch (error) {
 		console.error(error.message)
-		// Если ошибка связана с уже ожидающим наличным платежом,
-		// показываем страницу оплаты с сообщением
-		const rental = await paymentService.getRentalForPayment(
-			req.body.rental_id,
-			req.session.user.id,
-		)
-		res.render('payments/pay_rental', {
-			title: 'Оплата аренды',
-			currentPage: 'rentals',
-			rental,
-			amount: rental.total_price,
-			errors: [{ msg: error.message }],
-		})
+		// Если это аренда, покажем форму оплаты снова
+		if (req.body.payment_type === 'rental') {
+			const rental = await paymentService.getRentalForPayment(
+				req.body.rental_id,
+				req.session.user.id,
+			)
+			return res.render('payments/pay_rental', {
+				title: 'Оплата аренды',
+				currentPage: 'rentals',
+				rental,
+				amount: rental.total_price,
+				errors: [{ msg: error.message }],
+			})
+		}
+		// Для услуг и штрафов можно просто показать 500 или сообщение
+		res.status(400).send(error.message)
 	}
 }
 

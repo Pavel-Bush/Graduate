@@ -28,6 +28,13 @@ const FineModel = {
 			fineId,
 		])
 	},
+	async getByRentalId(rentalId) {
+		const [rows] = await pool.query(
+			'SELECT * FROM fines WHERE rental_id = ? ORDER BY created_at DESC',
+			[rentalId],
+		)
+		return rows
+	},
 }
 
 module.exports = FineModel

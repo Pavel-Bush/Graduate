@@ -16,18 +16,20 @@ const UserModel = {
 		phone,
 		password_hash,
 		driver_license_number,
-		birth_date,
+		license_issue_date,
+		license_categories,
 	}) {
 		const [result] = await pool.query(
-			`INSERT INTO users (full_name, email, phone, password_hash, driver_license_number, birth_date, role)
-             VALUES (?, ?, ?, ?, ?, ?, 'client')`,
+			`INSERT INTO users (full_name, email, phone, password_hash, driver_license_number, license_issue_date, role, license_categories)
+         VALUES (?, ?, ?, ?, ?, ?, 'client', ?)`,
 			[
 				full_name,
 				email,
 				phone,
 				password_hash,
 				driver_license_number,
-				birth_date,
+				license_issue_date || null,
+				license_categories,
 			],
 		)
 		return result.insertId
@@ -39,6 +41,13 @@ const UserModel = {
 			hash,
 			userId,
 		])
+	},
+
+	async findById(userId) {
+		const [rows] = await pool.query('SELECT * FROM users WHERE user_id = ?', [
+			userId,
+		])
+		return rows[0] || null
 	},
 }
 
